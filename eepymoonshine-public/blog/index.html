@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luna's Blog</title>
+<meta name="description" content="Luna's Blog">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Luna's Internet Corner">
+<meta property="og:title" content="Luna's Blog">
+<meta property="og:description" content="Luna's Blog">
+<meta property="og:url" content="https://eepymoonshine.world/blog/">
+<meta property="og:image" content="https://eepymoonshine.world/banner-embed.jpg">
+<meta property="og:image:width" content="382">
+<meta property="og:image:height" content="200">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Luna's Blog">
+<meta name="twitter:description" content="Luna's Blog">
+<meta name="twitter:image" content="https://eepymoonshine.world/banner-embed.jpg">
+<meta name="theme-color" content="#6ea8fe">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
+<link rel="icon" type="image/png" sizes="256x256" href="../favicon.png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css?v=17">
+</head>
+<body>
+
+<header>
+  <img class="banner" src="../banner.jpg" alt="perseus banner">
+  <h1>Luna's Blog</h1>
+  <p class="back-link"><a href="../index.html">&larr; Back home</a></p>
+</header>
+
+<main class="post-list" id="post-list">
+  <p class="post-empty">Loading&hellip;</p>
+</main>
+
+<footer>
+  ✨&nbsp;&nbsp;Luna's Internet Corner&nbsp;&nbsp;✨
+  <div class="footer-copyright">&copy; Luna 2026</div>
+</footer>
+
+<script>
+  fetch('index.json', { cache: 'no-store' })
+    .then(function (r) { return r.json(); })
+    .then(function (posts) {
+      var list = document.getElementById('post-list');
+      list.innerHTML = '';
+
+      if (!posts.length) {
+        list.innerHTML = '<p class="post-empty">No posts yet~ check back soon!</p>';
+        return;
+      }
+
+      posts.forEach(function (post) {
+        var a = document.createElement('a');
+        a.className = 'card post-entry';
+        a.href = 'post.html?p=' + encodeURIComponent(post.slug);
+
+        var head = document.createElement('span');
+        head.className = 'head';
+
+        var logoFrame = document.createElement('span');
+        logoFrame.className = 'logo-frame';
+        var icon = document.createElement('img');
+        icon.src = '../icons/blog.svg';
+        icon.alt = '';
+        logoFrame.appendChild(icon);
+
+        var title = document.createElement('h2');
+        title.className = 'name';
+        title.textContent = post.title;
+
+        head.appendChild(logoFrame);
+        head.appendChild(title);
+
+        var meta = document.createElement('span');
+        meta.className = 'desc post-meta';
+        meta.textContent = post.date_display;
+
+        var excerpt = document.createElement('p');
+        excerpt.className = 'post-excerpt';
+        excerpt.textContent = post.excerpt;
+
+        var more = document.createElement('span');
+        more.className = 'post-readmore';
+        more.textContent = 'Read more →';
+
+        a.appendChild(head);
+        a.appendChild(meta);
+        a.appendChild(excerpt);
+        a.appendChild(more);
+        list.appendChild(a);
+      });
+    })
+    .catch(function () {
+      document.getElementById('post-list').innerHTML =
+        '<p class="post-empty">Couldn’t load posts right now.</p>';
+    });
+</script>
+
+</body>
+</html>

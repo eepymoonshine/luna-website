@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perseus</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%E2%9C%A8</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <img class="banner" src="banner.jpg" alt="perseus.local banner">
+  <h1>Perseus Web Server</h1>
+  <p>Cute services running in this machine~</p>
+</header>
+
+<main class="grid">
+  <a class="card" href="http://perseus.local:8096" target="_blank" rel="noopener">
+    <span class="head">
+      <span class="logo-frame"><img src="icons/jellyfin.svg" alt=""></span>
+      <span class="name">Jellyfin</span>
+    </span>
+    <span class="desc">Movie, TV, and media streaming server</span>
+  </a>
+
+  <a class="card" href="http://perseus.local:8384" target="_blank" rel="noopener">
+    <span class="head">
+      <span class="logo-frame"><img src="icons/syncthing.svg" alt=""></span>
+      <span class="name">Syncthing</span>
+    </span>
+    <span class="desc">Continuous file synchronization across devices</span>
+  </a>
+
+  <a class="card" href="http://perseus.local:8080" target="_blank" rel="noopener">
+    <span class="head">
+      <span class="logo-frame"><img src="icons/qbittorrent.svg" alt=""></span>
+      <span class="name">qBittorrent</span>
+    </span>
+    <span class="desc">Torrent client and download manager</span>
+  </a>
+
+  <a class="card" href="http://perseus.local:5030" target="_blank" rel="noopener">
+    <span class="head">
+      <span class="logo-frame"><img src="icons/slskd.png" alt=""></span>
+      <span class="name">slskd</span>
+    </span>
+    <span class="desc">Soulseek client for P2P file sharing</span>
+  </a>
+
+  <a class="card" href="http://perseus.local:631" target="_blank" rel="noopener">
+    <span class="head">
+      <span class="logo-frame"><img src="icons/cups.svg" alt=""></span>
+      <span class="name">CUPS</span>
+    </span>
+    <span class="desc">Printer management and print queue</span>
+  </a>
+
+  <a class="card" href="https://perseus.local:9090" target="_blank" rel="noopener">
+    <span class="head">
+      <span class="logo-frame"><img src="icons/cockpit.svg" alt=""></span>
+      <span class="name">Cockpit</span>
+    </span>
+    <span class="desc">System administration and server monitoring</span>
+  </a>
+
+  <a class="card" href="http://perseus.local:3000" target="_blank" rel="noopener">
+    <span class="head">
+      <span class="logo-frame"><img src="icons/wakapi.svg" alt=""></span>
+      <span class="name">Wakapi</span>
+    </span>
+    <span class="desc">Coding time tracker and statistics dashboard</span>
+  </a>
+
+  <div class="card" title="No web UI — connect with a MySQL/MariaDB client">
+    <span class="head">
+      <span class="logo-frame"><img src="icons/mariadb.svg" alt=""></span>
+      <span class="name">MariaDB</span>
+    </span>
+    <span class="desc">Database server<br><code>perseus.local:3306</code></span>
+  </div>
+
+  <div class="card" title="No web UI — connect with a Redis client">
+    <span class="head">
+      <span class="logo-frame"><img src="icons/redis.svg" alt=""></span>
+      <span class="name">Redis</span>
+    </span>
+    <span class="desc">In-memory data store<br><code>perseus.local:6379</code></span>
+  </div>
+</main>
+
+<section class="status-panel">
+  <h2><span id="status-dot" class="status-dot"></span> <span id="status-title">Server status</span></h2>
+  <div class="status-metrics">
+    <div class="metric">
+      <div class="label">Uptime</div>
+      <div class="value" id="m-uptime">–</div>
+    </div>
+    <div class="metric">
+      <div class="label">Load avg</div>
+      <div class="value" id="m-load">–</div>
+    </div>
+    <div class="metric">
+      <div class="label">Memory</div>
+      <div class="value" id="m-mem">–</div>
+      <div class="bar"><div class="bar-fill" id="m-mem-bar"></div></div>
+    </div>
+    <div class="metric">
+      <div class="label">Disk</div>
+      <div class="value" id="m-disk">–</div>
+      <div class="bar"><div class="bar-fill" id="m-disk-bar"></div></div>
+    </div>
+  </div>
+  <div class="containers-list" id="containers-list"></div>
+
+  <div class="cpu-graph">
+    <div class="label"><span>CPU usage</span><span id="cpu-current">–</span></div>
+    <svg id="cpu-sparkline" viewBox="0 0 100 40" preserveAspectRatio="none">
+      <polyline id="cpu-sparkline-line" fill="none" stroke="#6ea8fe" stroke-width="2" points=""></polyline>
+    </svg>
+  </div>
+
+  <div class="status-updated" id="status-updated"></div>
+</section>
+
+<footer>✨&nbsp;&nbsp;Perseus Web Server @ Luna's (<span id="host-ip">192.168.1.116</span>)&nbsp;&nbsp;✨</footer>
+
+<script src="status.js"></script>
+
+</body>
+</html>

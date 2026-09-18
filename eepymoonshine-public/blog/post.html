@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luna's Blog</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
+<link rel="icon" type="image/png" sizes="256x256" href="../favicon.png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css?v=17">
+</head>
+<body>
+
+<header>
+  <img class="banner" src="../banner.jpg" alt="perseus banner">
+  <h1>Luna's Blog</h1>
+  <p class="back-link"><a href="index.html">&larr; Back to blog</a></p>
+</header>
+
+<div class="post-page-meta" id="post-meta"></div>
+<main class="about-content" id="post-content">
+  <p>Loading&hellip;</p>
+</main>
+
+<footer>
+  ✨&nbsp;&nbsp;Luna's Internet Corner&nbsp;&nbsp;✨
+  <div class="footer-copyright">&copy; Luna 2026</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    var slug = params.get('p') || '';
+    var content = document.getElementById('post-content');
+    var meta = document.getElementById('post-meta');
+
+    if (!/^[a-zA-Z0-9_-]+$/.test(slug)) {
+      content.innerHTML = '<p>Post not found.</p>';
+      return;
+    }
+
+    fetch('posts/' + slug + '.md', { cache: 'no-store' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('not found');
+        return r.text();
+      })
+      .then(function (md) {
+        content.innerHTML = marked.parse(md);
+        var titleMatch = md.match(/^#+\s*(.+)$/m);
+        if (titleMatch) document.title = titleMatch[1] + ' — Luna\'s Blog';
+      })
+      .catch(function () {
+        content.innerHTML = '<p>Post not found. <a href="index.html">Back to blog</a></p>';
+      });
+
+    fetch('index.json', { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (posts) {
+        var post = posts.find(function (p) { return p.slug === slug; });
+        if (post) meta.textContent = post.date_display;
+      })
+      .catch(function () {});
+  })();
+</script>
+
+</body>
+</html>

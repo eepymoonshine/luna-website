@@ -1,0 +1,6 @@
+[Unit]
+Description=Generate perseus-homepage status.json
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/perseus-status.sh

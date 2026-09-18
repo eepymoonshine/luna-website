@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luna's Internet Corner</title>
+<meta name="description" content="Girls are cooking...">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Luna's Internet Corner">
+<meta property="og:title" content="Luna's Internet Corner">
+<meta property="og:description" content="Girls are cooking...">
+<meta property="og:url" content="https://eepymoonshine.world/">
+<meta property="og:image" content="https://eepymoonshine.world/banner-embed.jpg">
+<meta property="og:image:width" content="382">
+<meta property="og:image:height" content="200">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Luna's Internet Corner">
+<meta name="twitter:description" content="Girls are cooking...">
+<meta name="twitter:image" content="https://eepymoonshine.world/banner-embed.jpg">
+<meta name="theme-color" content="#6ea8fe">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="256x256" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=17">
+</head>
+<body>
+
+<header>
+  <img class="banner" src="banner.jpg" alt="perseus banner">
+  <h1>Luna's Internet Corner</h1>
+  <p>Girls are cooking...</p>
+</header>
+
+<main class="grid">
+  <a class="card" href="https://jellyfin.eepymoonshine.world" target="_blank" rel="noopener">
+    <span class="head">
+      <span class="logo-frame"><img src="icons/jellyfin.svg" alt=""></span>
+      <span class="name">Jellyfin</span>
+    </span>
+    <span class="desc">Media Streaming Server</span>
+  </a>
+
+  <a class="card" href="about.html">
+    <span class="head">
+      <span class="logo-frame"><img src="icons/heart.svg" alt=""></span>
+      <span class="name">About Luna</span>
+    </span>
+    <span class="desc">Stuff about me~</span>
+  </a>
+
+  <a class="card" href="blog/index.html">
+    <span class="head">
+      <span class="logo-frame"><img src="icons/blog.svg" alt=""></span>
+      <span class="name">Blog</span>
+    </span>
+    <span class="desc">Luna's Blog</span>
+  </a>
+</main>
+
+<section class="now-playing" id="now-playing" hidden>
+  <h2 class="now-playing-heading">🎵 Now Playing&hellip;</h2>
+  <div class="now-playing-row">
+    <img class="now-playing-art" id="np-art" alt="">
+    <div class="now-playing-info">
+      <a class="now-playing-title" id="np-title" target="_blank" rel="noopener"></a>
+      <div class="bar now-playing-bar">
+        <div class="bar-fill" id="np-bar-fill"></div>
+      </div>
+      <div class="now-playing-sub" id="np-sub"></div>
+    </div>
+  </div>
+</section>
+
+<section class="status-panel">
+  <h2>
+    <span class="status-heading-title"><span id="status-dot" class="status-dot"></span> <span id="status-title">Server status</span></span>
+    <div class="containers-list" id="containers-list"></div>
+  </h2>
+  <div class="status-metrics">
+    <div class="metric">
+      <div class="label">CPU</div>
+      <div class="value" id="m-cpu">–</div>
+      <div class="bar"><div class="bar-fill" id="m-cpu-bar"></div></div>
+    </div>
+    <div class="metric">
+      <div class="label">Memory</div>
+      <div class="value" id="m-mem">–</div>
+      <div class="bar"><div class="bar-fill" id="m-mem-bar"></div></div>
+    </div>
+    <div class="metric">
+      <div class="label">Disk</div>
+      <div class="value" id="m-disk">–</div>
+      <div class="bar"><div class="bar-fill" id="m-disk-bar"></div></div>
+    </div>
+  </div>
+
+  <div class="cpu-graph">
+    <div class="label"><span>CPU usage</span><span id="cpu-current">–</span></div>
+    <svg id="cpu-sparkline" viewBox="0 0 100 40" preserveAspectRatio="none">
+      <polyline id="cpu-sparkline-line" fill="none" stroke="#6ea8fe" stroke-width="2" points=""></polyline>
+    </svg>
+  </div>
+
+  <div class="status-footer">
+    <span id="m-uptime"></span>
+    <span class="status-updated" id="status-updated"></span>
+  </div>
+</section>
+
+<div class="webring" id="webring">
+  <a href="https://abigail.sh/" target="_blank" rel="noopener">
+    <img src="https://abigail.sh/static/images/button.png" alt="abigail.sh" width="88" height="31">
+  </a>
+  <a href="https://eepymoonshine.world/">
+    <img src="icons/lunaa-button.avif" alt="eepymoonshine.world" width="88" height="31">
+  </a>
+  <a href="https://azee.sh" target="_blank" rel="noopener">
+    <img src="https://azee.sh/images/web-badge.gif" alt="azee.sh" width="88" height="31">
+  </a>
+  <a href="https://lumap.xyz" target="_blank" rel="noopener">
+    <img src="https://lumap.xyz/button.png" alt="lumap.xyz" width="88" height="31">
+  </a>
+  <a href="https://pre1ude.dev" target="_blank" rel="noopener">
+    <img src="https://pre1ude.dev/blankie.png" alt="pre1ude.dev" width="88" height="31">
+  </a>
+  <a href="https://imrock.dev" target="_blank" rel="noopener">
+    <img src="https://imrock.dev/assets/8133.png" alt="imrock.dev" width="81" height="33">
+  </a>
+  <a href="https://auxim.gay" target="_blank" rel="noopener">
+    <img src="https://auxim.gay/img/webring/auxim.png" alt="auxim.gay" width="88" height="31">
+  </a>
+  <a href="https://uwu.gal" target="_blank" rel="noopener">
+    <img src="https://uwu.gal/button.png" alt="uwu.gal" width="88" height="31">
+  </a>
+  <a href="https://byeoon.dev" target="_blank" rel="noopener">
+    <img src="https://byeoon.dev/img/button.png" alt="byeoon.dev" width="88" height="31">
+  </a>
+</div>
+
+<footer>
+  ✨&nbsp;&nbsp;Luna's Internet Corner&nbsp;&nbsp;✨
+  <div class="footer-copyright">&copy; Luna 2026</div>
+</footer>
+
+<script src="main.js"></script>
+
+</body>
+</html>
