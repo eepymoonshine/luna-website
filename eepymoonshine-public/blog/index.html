@@ -24,9 +24,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../style.css?v=17">
+<link rel="stylesheet" href="../style.css?v=18">
 </head>
 <body>
+
+<div class="weather-widget weather-loading" id="weather-widget" title="Loading weather…">
+  <span class="weather-icon" id="weather-icon">⛅</span>
+  <span class="weather-temp" id="weather-temp">–°</span>
+</div>
 
 <header>
   <img class="banner" src="../banner.jpg" alt="perseus banner">
@@ -101,6 +106,7 @@
         '<p class="post-empty">Couldn’t load posts right now.</p>';
     });
 </script>
+<script src="../weather.js"></script>
 
 </body>
 </html>

@@ -24,9 +24,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=17">
+<link rel="stylesheet" href="style.css?v=18">
 </head>
 <body>
+
+<div class="weather-widget weather-loading" id="weather-widget" title="Loading weather…">
+  <span class="weather-icon" id="weather-icon">⛅</span>
+  <span class="weather-temp" id="weather-temp">–°</span>
+</div>
 
 <header>
   <img class="banner" src="banner.jpg" alt="perseus banner">
@@ -35,14 +40,6 @@
 </header>
 
 <main class="grid">
-  <a class="card" href="https://jellyfin.eepymoonshine.world" target="_blank" rel="noopener">
-    <span class="head">
-      <span class="logo-frame"><img src="icons/jellyfin.svg" alt=""></span>
-      <span class="name">Jellyfin</span>
-    </span>
-    <span class="desc">Media Streaming Server</span>
-  </a>
-
   <a class="card" href="about.html">
     <span class="head">
       <span class="logo-frame"><img src="icons/heart.svg" alt=""></span>
@@ -146,6 +143,7 @@
 </footer>
 
 <script src="main.js"></script>
+<script src="weather.js"></script>
 
 </body>
 </html>
