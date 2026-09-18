@@ -3,9 +3,7 @@
 Two static sites served by nginx on **perseus.local**, plus the shared status
 generator that feeds both of them:
 
-- `perseus-homepage/`: private LAN dashboard (`perseus.local`, port 80,
-  default server) linking to services running on the box (Jellyfin,
-  Syncthing, qBittorrent, slskd, CUPS, Cockpit).
+- `perseus-homepage/`: private LAN dashboard linking to services running on the box
 - `eepymoonshine-public/`: the public-facing site at
   **eepymoonshine.world** (and `www.eepymoonshine.world`), including a small
   blog under `blog/`.
