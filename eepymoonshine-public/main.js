@@ -106,7 +106,7 @@
       var line = document.getElementById('cpu-sparkline-line');
       line.setAttribute('points', points);
       var maxRecent = Math.max.apply(null, hist.concat([0]));
-      line.setAttribute('stroke', maxRecent >= 90 ? '#e05a5a' : (maxRecent >= 75 ? '#e0a93e' : '#6ea8fe'));
+      line.setAttribute('stroke', maxRecent >= 90 ? '#e05a5a' : (maxRecent >= 75 ? '#e0a93e' : '#37d8d0'));
     }
 
     var ageSec = (Date.now() - new Date(data.generated_at).getTime()) / 1000;
