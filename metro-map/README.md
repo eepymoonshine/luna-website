@@ -20,11 +20,15 @@ python3 test_metro_map.py         # tests
 - `metro_map.py` — worker, board parsing, train inference, HTTP server
 - `index.html` — the map page
 - `stations.json` — station code → `[lat, lon, name]` (coordinates from Wikidata)
-- `deploy/` — systemd unit and nginx block used on perseus
+- `deploy/metro-map.service` — systemd unit used on perseus (the nginx `/metro/` block is in
+  `../eepymoonshine-public/nginx.conf`)
 
 ## Deploy (perseus)
 
+From the repo root; see the main README for the rest of the setup.
+
 ```
-scp metro_map.py index.html stations.json perseus.local:/opt/metro-map/
-ssh perseus.local 'systemctl restart metro-map'
+rsync -ci --chown=root:root --chmod=F644 --rsync-path="sudo rsync" \
+  metro-map/metro_map.py metro-map/index.html metro-map/stations.json perseus.local:/opt/metro-map/
+ssh perseus.local 'sudo systemctl restart metro-map'
 ```
