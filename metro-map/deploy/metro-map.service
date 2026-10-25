@@ -1,0 +1,17 @@
+[Unit]
+Description=Santiago Metro live map
+After=network-online.target nginx.service
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/python3 -I /opt/metro-map/metro_map.py 8765 10.88.0.1
+DynamicUser=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+NoNewPrivileges=yes
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

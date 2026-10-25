@@ -1,0 +1,1013 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Metro Live Map</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <!-- Metro de Santiago emblem, Wikimedia Commons (public domain) -->
+    <link
+      rel="icon"
+      href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 -14 141 141"%3E%3Cpath fill="%23D00A2C" d="M87.42,56.31L69.991,87.854L52.545,56.31l17.447-31.544L87.42,56.31z M122.552,56.31l-17.439,31.544 L87.664,56.31l17.449-31.544L122.552,56.31z M52.301,56.31L34.875,87.854L17.426,56.31l17.449-31.544L52.301,56.31z M70.238-0.002 c38.794,0,70.231,25.295,70.231,56.503c0,31.205-31.437,56.501-70.231,56.501c-35.004,0-64.045-20.62-69.353-47.583 C0.347,62.682,0,59.572,0,56.501C0,30.25,21.891,9.769,48.445,2.774C55.392,0.936,62.631-0.002,70.238-0.002 M5.272,58.65 c1.313,25.563,26.687,46.277,58.852,48.623c2.711,0.192,5.432,0.257,8.166,0.179c31.933-0.88,57.966-20.494,61.646-44.925 c0.415-2.755,0.617-5.584,0.552-8.434c-0.113-5.359-1.161-10.52-3.394-15.217c-8.245-17.673-28.692-30.772-53.357-33.02 c-3.223-0.313-6.483-0.415-9.761-0.336c-4.429,0.11-8.734,0.562-12.892,1.324C35.088,10.182,9.117,25.475,5.619,50.962 C5.23,53.63,5.264,56.727,5.272,58.65"/%3E%3C/svg%3E'
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Commissioner:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script>
+      try {
+        if (localStorage.getItem('theme') === 'light') document.documentElement.dataset.theme = 'light';
+      } catch (e) {}
+    </script>
+    <style>
+      :root {
+        --bg: #1b1d22;
+        --panel: #22242b;
+        --fg: #d3dae3;
+        --muted: #8b93a1;
+        --rule: #34373f;
+        --ctl: #2b2e37;
+        --ctl-fg: #d3dae3;
+        --ctl-bd: #3a3e48;
+        --accent: #37d8d0;
+        --ring: #fff;
+        --hover: #ffffff0a;
+        --attr-bg: #1b1d22cc;
+        --attr: #8b93a1;
+        --link: #37d8d0;
+        --shadow: #0008;
+        color-scheme: dark;
+      }
+      :root[data-theme='light'] {
+        --bg: #eef0f3;
+        --panel: #fff;
+        --fg: #1b1d22;
+        --muted: #5f6672;
+        --rule: #e1e4e8;
+        --ctl: #f6f7f9;
+        --ctl-fg: #1b1d22;
+        --ctl-bd: #d5d9df;
+        --accent: #0f8f88;
+        --ring: #000;
+        --hover: #0000000a;
+        --attr-bg: #fffc;
+        --attr: #5f6672;
+        --link: #0f8f88;
+        --shadow: #0002;
+        color-scheme: light;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        font:
+          13px/1.4 'Commissioner',
+          system-ui,
+          sans-serif;
+        background: var(--bg);
+        color: var(--fg);
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+      #topbar {
+        position: relative;
+        z-index: 1001;
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 16px;
+        background: var(--panel);
+        border-bottom: 1px solid var(--rule);
+      }
+      #topbar span {
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+      #app {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+      }
+      button {
+        font-family: inherit;
+      }
+      button:focus-visible,
+      a:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      #side {
+        width: 300px;
+        flex: none;
+        overflow-y: auto;
+        background: var(--panel);
+        box-shadow: 2px 0 16px var(--shadow);
+        z-index: 1000;
+        scrollbar-width: thin;
+        scrollbar-color: var(--rule) transparent;
+      }
+      #map {
+        flex: 1;
+      }
+      #head {
+        padding: 14px 16px 12px;
+        border-bottom: 1px solid var(--rule);
+      }
+      #head b {
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      #u {
+        display: inline-block;
+        margin-top: 2px;
+      }
+      #note {
+        display: inline-block;
+        margin-top: 4px;
+        font-size: 12px;
+      }
+      .btns {
+        float: right;
+        display: flex;
+        gap: 6px;
+        margin: -1px 0 4px 8px;
+      }
+      .btns button,
+      #track button,
+      #topbar a {
+        background: var(--ctl);
+        text-decoration: none;
+        color: var(--ctl-fg);
+        border: 1px solid var(--ctl-bd);
+        border-radius: 999px;
+        padding: 3px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          color 0.15s;
+      }
+      .btns button:hover,
+      #track button:hover,
+      #topbar a:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      #tabs {
+        display: flex;
+        gap: 4px;
+        margin-top: 12px;
+      }
+      #tabs button {
+        flex: 1;
+        border: 2px solid var(--c);
+        background: transparent;
+        color: var(--fg);
+        border-radius: 8px;
+        padding: 5px 0;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      #tabs button:hover {
+        background: var(--hover);
+      }
+      #tabs button[aria-pressed='true'] {
+        background: var(--c);
+        color: var(--ink);
+      }
+      #dirs {
+        padding: 12px 16px 4px;
+      }
+      #track {
+        margin: 12px 12px 0;
+        padding: 10px 12px;
+        border: 1px solid var(--rule);
+        border-left: 3px solid var(--accent);
+        border-radius: 8px;
+        background: var(--hover);
+        line-height: 1.5;
+      }
+      #track .lh {
+        font-size: 14px;
+      }
+      #track .lh .muted {
+        margin-left: 0;
+      }
+      #track .acts {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-top: 6px;
+      }
+      #track input {
+        accent-color: var(--accent);
+        vertical-align: -2px;
+        margin: 0 5px 0 0;
+      }
+      .pulse {
+        stroke: var(--ring);
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: pulse 1.6s ease-out infinite;
+      }
+      @keyframes pulse {
+        from {
+          transform: scale(0.7);
+          opacity: 0.9;
+        }
+        to {
+          transform: scale(1.5);
+          opacity: 0;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .pulse {
+          animation: none;
+        }
+        * {
+          transition: none !important;
+        }
+      }
+      .lh {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 15px;
+      }
+      .lh .muted {
+        margin-left: auto;
+        font-size: 12px;
+      }
+      .lanes {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 8px;
+        font-size: 12px;
+      }
+      #diagram {
+        position: relative;
+        padding: 4px 0 16px;
+      }
+      #diagram svg {
+        position: absolute;
+        left: 4px;
+        top: 4px;
+        pointer-events: none;
+      }
+      #diagram .train {
+        pointer-events: all;
+        cursor: default;
+      }
+      .lane {
+        stroke: var(--rule);
+        stroke-width: 1.5;
+        stroke-dasharray: 2 5;
+      }
+      .row {
+        height: 38px;
+        box-sizing: border-box;
+        padding: 0 10px 0 96px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.1s;
+      }
+      .row:hover {
+        background: var(--hover);
+      }
+      .nm {
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .end .nm {
+        font-weight: 700;
+      }
+      .eta {
+        font-size: 11px;
+        color: var(--muted);
+        display: flex;
+        gap: 10px;
+        font-variant-numeric: tabular-nums;
+      }
+      .rd {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        margin-left: 4px;
+        vertical-align: 0;
+      }
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 10px;
+        margin-top: 6px;
+        font-size: 12px;
+      }
+      .legend .rd {
+        margin: 0 4px 0 0;
+      }
+      .badge {
+        display: inline-block;
+        min-width: 16px;
+        box-sizing: border-box;
+        padding: 0 4px;
+        margin-left: 5px;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 16px;
+        text-align: center;
+        vertical-align: 1px;
+      }
+      .badge.big {
+        margin: 0;
+        min-width: 26px;
+        font-size: 13px;
+        line-height: 24px;
+        border-radius: 12px;
+      }
+      .t1 {
+        stroke: var(--ring);
+      }
+      .leaflet-container {
+        background: var(--bg);
+        font-family: inherit;
+      }
+      /* OSM has no dark tiles */
+      :root:not([data-theme='light']) .leaflet-tile-pane {
+        filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9) saturate(0.7);
+      }
+      .leaflet-bar {
+        border: 1px solid var(--ctl-bd) !important;
+        border-radius: 8px !important;
+        overflow: hidden;
+        box-shadow: 0 2px 10px var(--shadow) !important;
+      }
+      .leaflet-bar a,
+      .leaflet-bar a:hover {
+        background: var(--ctl);
+        color: var(--ctl-fg);
+        border-color: var(--ctl-bd);
+      }
+      .leaflet-bar a:hover {
+        color: var(--accent);
+      }
+      .leaflet-tooltip {
+        background: var(--ctl);
+        color: var(--ctl-fg);
+        border-color: var(--ctl-bd);
+        border-radius: 8px;
+        padding: 6px 9px;
+        box-shadow: 0 4px 14px var(--shadow);
+        font-size: 12px;
+      }
+      .leaflet-tooltip-top:before {
+        border-top-color: var(--ctl);
+      }
+      .leaflet-tooltip-bottom:before {
+        border-bottom-color: var(--ctl);
+      }
+      .leaflet-tooltip-left:before {
+        border-left-color: var(--ctl);
+      }
+      .leaflet-tooltip-right:before {
+        border-right-color: var(--ctl);
+      }
+      .leaflet-control-attribution {
+        background: var(--attr-bg) !important;
+        color: var(--attr);
+        border-radius: 6px 0 0 0;
+      }
+      .leaflet-control-attribution a {
+        color: var(--link);
+      }
+      #fold {
+        display: none;
+      }
+      @media (max-width: 700px) {
+        #app {
+          flex-direction: column-reverse;
+        }
+        #side {
+          width: auto;
+          height: 45vh;
+          border-radius: 14px 14px 0 0;
+          box-shadow: 0 -4px 16px var(--shadow);
+        }
+        #map {
+          flex: 1;
+          min-height: 0;
+        }
+        #fold {
+          display: block;
+        }
+        .folded #side {
+          height: auto;
+        }
+        .folded #dirs,
+        .folded #diagram,
+        .folded #note {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header id="topbar">
+      <span>✨ Luna's Internet Corner ✨</span>
+      <a href="/" data-i18n="home"></a>
+    </header>
+    <div id="app">
+      <aside id="side">
+        <div id="head">
+          <div class="btns">
+            <button
+              id="fold"
+              onclick="setFold(!document.body.classList.contains('folded'))"
+              aria-controls="diagram"
+            ></button>
+            <button id="lang" onclick="toggleLang()"></button>
+            <button id="theme" onclick="toggleTheme()"></button>
+          </div>
+          <b data-i18n="title"></b><br />
+          <span id="u" class="muted"></span><br />
+          <span id="note" class="muted" data-i18n="note"></span>
+          <div id="tabs" role="group"></div>
+        </div>
+        <div id="track" hidden></div>
+        <div id="dirs"></div>
+        <div id="diagram"></div>
+      </aside>
+      <div id="map"></div>
+    </div>
+    <script>
+      // ---- language (Spanish default) ----
+      const I18N = {
+        es: {
+          title: 'Metro de Santiago · en vivo',
+          loading: 'cargando…',
+          waiting: 'esperando la primera actualización',
+          note: 'Posiciones estimadas a partir de los paneles de cada estación; los datos se actualizan cada 60 s.',
+          status: (n, u) => `${n} trenes · actualizado ${u}`,
+          failed: 'error al actualizar: ',
+          light: '☀ Claro',
+          dark: '☾ Oscuro',
+          show: '▴ Mostrar',
+          hide: '▾ Ocultar',
+          other: 'EN',
+          otherName: 'English',
+          line: 'Línea',
+          trains: (n) => `${n} trenes`,
+          noLive: 'sin datos en vivo',
+          express: 'Ruta expresa:',
+          roja: 'Roja',
+          verde: 'Verde',
+          comun: 'Común',
+          notRunning: '(no opera ahora)',
+          atPlatform: 'en andén',
+          arriving: 'llegando',
+          departs: (m) => `sale en ${m} min`,
+          departing: 'saliendo',
+          at: (name) => `en ${name}`,
+          clickTrack: 'clic para seguir',
+          tracking: 'Siguiendo →',
+          arrived: (name) => `llegó a ${name}`,
+          lost: (w, t) => `perdido · visto por última vez ${w} a las ${t}`,
+          notSeen: (w) => `no visto en la última actualización · estaba ${w}`,
+          since: (t) => `desde ${t}`,
+          follow: 'Seguir',
+          stop: 'Detener',
+          home: '← Volver al inicio',
+        },
+        en: {
+          title: 'Metro de Santiago · live',
+          loading: 'loading…',
+          waiting: 'waiting for first fetch',
+          note: 'Positions estimated from station ETA boards; data updates every 60 s.',
+          status: (n, u) => `${n} trains · updated ${u}`,
+          failed: 'update failed: ',
+          light: '☀ Light',
+          dark: '☾ Dark',
+          show: '▴ Show',
+          hide: '▾ Hide',
+          other: 'ES',
+          otherName: 'Español',
+          line: 'Line',
+          trains: (n) => `${n} trains`,
+          noLive: 'no live data',
+          express: 'Express:',
+          roja: 'Roja',
+          verde: 'Verde',
+          comun: 'Común',
+          notRunning: '(not running)',
+          atPlatform: 'at platform',
+          arriving: 'arriving',
+          departs: (m) => `departs ${m} min`,
+          departing: 'departing',
+          at: (name) => `at ${name}`,
+          clickTrack: 'click to track',
+          tracking: 'Tracking →',
+          arrived: (name) => `arrived at ${name}`,
+          lost: (w, t) => `lost track · last seen ${w} at ${t}`,
+          notSeen: (w) => `not seen in the last update · was ${w}`,
+          since: (t) => `since ${t}`,
+          follow: 'Follow',
+          stop: 'Stop',
+          home: '← Back home',
+        },
+      };
+      let lang = 'es';
+      try {
+        lang = localStorage.getItem('lang') == 'en' ? 'en' : 'es';
+      } catch (e) {}
+      const translate = (key, ...args) => {
+        const entry = I18N[lang][key];
+        return typeof entry == 'function' ? entry(...args) : entry;
+      };
+
+      // ---- map setup and helpers ----
+      const map = L.map('map').setView([-33.47, -70.64], 12);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors',
+      }).addTo(map);
+      const stationLayer = L.layerGroup().addTo(map),
+        trainLayer = L.layerGroup().addTo(map);
+      const escapeHtml = (text) =>
+        text.replace(/[&<>"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[char]);
+      let snapshot = null,
+        selectedLine = '1';
+      try {
+        selectedLine = localStorage.getItem('line') || selectedLine;
+      } catch (e) {}
+      const findLine = (lineId) => snapshot.lines.find((line) => line.line == lineId);
+      function pointAt(stations, position) {
+        // lat/lng at a fractional station index
+        const index = Math.min(Math.floor(position), stations.length - 2),
+          fraction = position - index,
+          from = stations[index].ll,
+          to = stations[index + 1].ll;
+        return [from[0] + (to[0] - from[0]) * fraction, from[1] + (to[1] - from[1]) * fraction];
+      }
+      const ROUTE_COLOR = { R: '#e4002b', V: '#3aaa35' },
+        ROUTE_NAME = { R: 'Ruta Roja', V: 'Ruta Verde' };
+      // express trains take their route colour
+      const trainColor = (line, train) => (train.route ? ROUTE_COLOR[train.route] : line.color);
+      const routeDot = (route) =>
+        route
+          ? `<i class="rd" style="background:${ROUTE_COLOR[route]}" title="${ROUTE_NAME[route]}"></i>`
+          : '';
+      function trainIcon(color, route, angle, radius, tipX, fontSize) {
+        // teardrop: circle with its point toward travel direction (angle, clockwise from east); route letter stays upright
+        const shoulder = (50 * Math.PI) / 180,
+          shoulderX = (radius * Math.cos(shoulder)).toFixed(2),
+          shoulderY = (radius * Math.sin(shoulder)).toFixed(2);
+        const drop = `
+          <path transform="rotate(${angle})"
+              d="M${tipX},0 L${shoulderX},-${shoulderY} A${radius},${radius} 0 1 0 ${shoulderX},${shoulderY} Z"
+              fill="${color}" class="t1" stroke-width="1.5" stroke-linejoin="round"/>`;
+        const letter = `
+          <text text-anchor="middle" dominant-baseline="central" font-size="${fontSize}" font-weight="700"
+              font-family="system-ui,sans-serif" fill="${textColorOn(color)}">${route}</text>`;
+        return drop + (route ? letter : '');
+      }
+      function textColorOn(hex) {
+        // dark text on light line colours (L2 yellow), white otherwise
+        const [red, green, blue] = [1, 3, 5].map((offset) => parseInt(hex.slice(offset, offset + 2), 16));
+        return 0.299 * red + 0.587 * green + 0.114 * blue > 160 ? '#111' : '#fff';
+      }
+      function headingAt(stations, position, towardLast) {
+        // screen angle (deg, 0 = east, clockwise) of travel at a fractional station index
+        let from = towardLast ? Math.floor(position) : Math.ceil(position),
+          to = towardLast ? from + 1 : from - 1;
+        // at the terminal: use the arriving segment
+        if (to < 0 || to >= stations.length) [from, to] = [towardLast ? from - 1 : from + 1, from];
+        const [fromLat, fromLng] = stations[from].ll,
+          [toLat, toLng] = stations[to].ll;
+        const radians = Math.atan2(
+          -(toLat - fromLat),
+          (toLng - fromLng) * Math.cos((fromLat * Math.PI) / 180),
+        );
+        return (radians * 180) / Math.PI;
+      }
+      function describePosition(stations, position, towardLast) {
+        // station the train is at, or the pair it is between in travel order
+        if (Number.isInteger(position)) return translate('at', escapeHtml(stations[position].name));
+        const lower = stations[Math.floor(position)].name,
+          upper = stations[Math.ceil(position)].name;
+        const [from, to] = towardLast ? [lower, upper] : [upper, lower];
+        return escapeHtml(from) + ' → ' + escapeHtml(to);
+      }
+      // ---- map ----
+      function selectLine(lineId) {
+        selectedLine = lineId;
+        try {
+          localStorage.setItem('line', lineId);
+        } catch (e) {}
+        render();
+      }
+      function render() {
+        stationLayer.clearLayers();
+        trainLayer.clearLayers();
+        for (const line of snapshot.lines) {
+          const stations = line.stations,
+            isSelected = line.line == selectedLine;
+          L.polyline(
+            stations.map((station) => station.ll),
+            { color: line.color, weight: isSelected ? 8 : 5, opacity: isSelected ? 1 : 0.7 },
+          )
+            .on('click', () => selectLine(line.line))
+            .addTo(stationLayer);
+          for (const station of stations)
+            L.circleMarker(station.ll, {
+              radius: 4,
+              color: '#333',
+              weight: 1,
+              fillColor: '#fff',
+              fillOpacity: 1,
+            })
+              .bindTooltip(
+                `<b>${escapeHtml(station.name)}</b>` +
+                  `<br>→ ${escapeHtml(stations.at(-1).name)}: ${escapeHtml(station.status[1])}` +
+                  `<br>→ ${escapeHtml(stations[0].name)}: ${escapeHtml(station.status[2])}`,
+              )
+              .on('click', () => selectLine(line.line))
+              .addTo(stationLayer);
+          if (tracking && tracking.line == line.line) drawJourney(line);
+          for (const train of line.trains) {
+            const towardLast = train.via == 1,
+              angle = headingAt(stations, train.pos, towardLast),
+              radians = (angle * Math.PI) / 180;
+            // nudge 6px to the right of travel so opposite directions don't overlap
+            const offsetX = -Math.sin(radians) * 6,
+              offsetY = Math.cos(radians) * 6;
+            L.marker(pointAt(stations, train.pos), {
+              zIndexOffset: train.isTracked ? 1000 : 0,
+              opacity: tracking && !train.isTracked ? 0.35 : 1,
+              icon: L.divIcon({
+                className: '',
+                iconSize: [24, 24],
+                iconAnchor: [12, 12],
+                html: `
+                  <svg width="24" height="24" viewBox="-12 -12 24 24"
+                      style="overflow:visible;transform:translate(${offsetX}px,${offsetY}px)${train.isTracked ? ' scale(1.5)' : ''}">
+                    ${train.isTracked ? '<circle r="9" class="pulse" fill="none" stroke-width="2"/>' : ''}
+                    ${trainIcon(trainColor(line, train), train.route, angle, 6.5, 11, 8.5)}
+                  </svg>`,
+              }),
+            })
+              .bindTooltip(
+                `${translate('line')} ${line.line} → ${escapeHtml((towardLast ? stations.at(-1) : stations[0]).name)}` +
+                  (train.route ? ' · ' + ROUTE_NAME[train.route] : '') +
+                  `<br>${describePosition(stations, train.pos, towardLast)}` +
+                  (train.isTracked ? '' : `<br><i>${translate('clickTrack')}</i>`),
+              )
+              .on('click', () => track(line.line, train))
+              .addTo(trainLayer);
+          }
+        }
+        document.getElementById('tabs').innerHTML = snapshot.lines
+          .map(
+            (line) => `
+              <button style="--c:${line.color};--ink:${textColorOn(line.color)}"
+                  aria-pressed="${line.line == selectedLine}" onclick="selectLine('${line.line}')">${line.line}</button>`,
+          )
+          .join('');
+        drawSide(findLine(selectedLine));
+        drawTrack();
+      }
+      // ---- sidebar line diagram ----
+      function shortEta(boardText) {
+        // board text -> compact ETA
+        const minutes = boardText.match(/([0-9]+) minuto/);
+        if (/en estaci/i.test(boardText)) return translate('atPlatform');
+        if (/Llegando/.test(boardText)) return translate('arriving');
+        if (/Saliendo/.test(boardText))
+          return minutes ? translate('departs', minutes[1]) : translate('departing');
+        return minutes ? `< ${minutes[1]} min` : '–';
+      }
+      function focusStation(index) {
+        map.setView(findLine(selectedLine).stations[index].ll, 15);
+      }
+      function drawSide(line) {
+        // track in the middle, ▲ lane (toward first station) left, ▼ lane (toward last) right
+        const stations = line.stations,
+          count = stations.length;
+        const ROW_HEIGHT = 38,
+          UP_LANE_X = 18,
+          TRACK_X = 42,
+          DOWN_LANE_X = 66;
+        const rowY = (position) => ROW_HEIGHT / 2 + position * ROW_HEIGHT;
+        const trainCount = (via) => line.trains.filter((train) => train.via == via).length;
+        const transferLines = (latLng) =>
+          snapshot.lines.filter(
+            (other) =>
+              other.line != line.line && other.stations.some((station) => station.ll + '' == latLng + ''),
+          );
+        const legend = `
+          <div class="legend muted">
+            ${translate('express')}
+            <span>${routeDot('R')}${translate('roja')}</span>
+            <span>${routeDot('V')}${translate('verde')}</span>
+            <span><i class="rd" style="background:#fff"></i>${translate('comun')}</span>
+            ${line.trains.some((train) => train.route) ? '' : `<span>${translate('notRunning')}</span>`}
+          </div>`;
+        document.getElementById('dirs').innerHTML = `
+          <div class="lh">
+            <span class="badge big" style="background:${line.color};color:${textColorOn(line.color)}">${line.line}</span>
+            <b>${translate('line')} ${line.line}</b>
+            <span class="muted">${line.live ? translate('trains', line.trains.length) : translate('noLive')}</span>
+          </div>
+          ${stations.some((station) => station.type) ? legend : ''}
+          <div class="lanes muted">
+            <span>▲ ${escapeHtml(stations[0].name)}${line.live ? ' · ' + trainCount(2) : ''}</span>
+            <span>▼ ${escapeHtml(stations.at(-1).name)}${line.live ? ' · ' + trainCount(1) : ''}</span>
+          </div>`;
+        let svg = `
+          <line x1="${UP_LANE_X}" y1="${rowY(0)}" x2="${UP_LANE_X}" y2="${rowY(count - 1)}" class="lane"/>
+          <line x1="${DOWN_LANE_X}" y1="${rowY(0)}" x2="${DOWN_LANE_X}" y2="${rowY(count - 1)}" class="lane"/>
+          <line x1="${TRACK_X}" y1="${rowY(0)}" x2="${TRACK_X}" y2="${rowY(count - 1)}"
+              stroke="${line.color}" stroke-width="8" stroke-linecap="round"/>`;
+        let rows = '';
+        stations.forEach((station, index) => {
+          const transfers = transferLines(station.ll),
+            isTerminal = index == 0 || index == count - 1;
+          const cy = rowY(index);
+          svg += transfers.length
+            ? `<circle cx="${TRACK_X}" cy="${cy}" r="7" fill="#fff" stroke="#111" stroke-width="2.5"/>`
+            : ROUTE_COLOR[station.type]
+              ? `<circle cx="${TRACK_X}" cy="${cy}" r="4.5" fill="${ROUTE_COLOR[station.type]}" stroke="#fff" stroke-width="1.5"/>`
+              : `<circle cx="${TRACK_X}" cy="${cy}" r="${isTerminal ? 5.5 : 3.5}" fill="#fff"/>`;
+          const badges = transfers
+            .map(
+              (other) =>
+                `<span class="badge" style="background:${other.color};color:${textColorOn(other.color)}">${other.line}</span>`,
+            )
+            .join('');
+          const eta = `
+            <div class="eta">
+              <span>▲ ${shortEta(station.status[2])}${routeDot(station.route[2])}</span>
+              <span>▼ ${shortEta(station.status[1])}${routeDot(station.route[1])}</span>
+            </div>`;
+          const title =
+            escapeHtml(station.name) +
+            `&#10;→ ${escapeHtml(stations.at(-1).name)}: ${escapeHtml(station.status[1])}` +
+            `&#10;→ ${escapeHtml(stations[0].name)}: ${escapeHtml(station.status[2])}`;
+          rows += `
+            <div class="row${isTerminal ? ' end' : ''}" onclick="focusStation(${index})" title="${title}">
+              <div class="nm">${escapeHtml(station.name)}${badges}</div>
+              ${line.live ? eta : ''}
+            </div>`;
+        });
+        line.trains.forEach((train, index) => {
+          const towardLast = train.via == 1,
+            cx = towardLast ? DOWN_LANE_X : UP_LANE_X,
+            cy = rowY(train.pos);
+          // <title> is shown as-is, so its text keeps the \n line breaks and no indentation
+          const hoverText =
+            `→ ${escapeHtml((towardLast ? stations.at(-1) : stations[0]).name)}${train.route ? ' · ' + ROUTE_NAME[train.route] : ''}` +
+            `\n${describePosition(stations, train.pos, towardLast)}${train.isTracked ? '' : '\n' + translate('clickTrack')}`;
+          svg += `
+            <g class="train" opacity="${tracking && !train.isTracked ? 0.35 : 1}"
+                onclick="track('${line.line}', findLine('${line.line}').trains[${index}])">
+              <title>${hoverText}</title>
+              <g transform="translate(${cx},${cy})">
+                ${train.isTracked ? '<circle r="12" class="pulse" fill="none" stroke-width="2"/>' : ''}
+                ${trainIcon(trainColor(line, train), train.route, towardLast ? 90 : -90, 8, 13.5, 10)}
+              </g>
+            </g>`;
+        });
+        document.getElementById('diagram').innerHTML =
+          `<svg width="84" height="${count * ROW_HEIGHT}" aria-hidden="true">${svg}</svg>${rows}`;
+      }
+      // ---- train tracking ----
+      // Trains have no IDs: each snapshot is inferred afresh, so the tracked train is re-found in every new snapshot
+      // as the train on the same line and direction closest to where it should have got to (~0.5 stations/min).
+      let tracking = null;
+      const toSeconds = (clock) => {
+        const [hours, minutes, seconds] = clock.split(':').map(Number);
+        return hours * 3600 + minutes * 60 + seconds;
+      };
+      function track(lineId, train) {
+        snapshot.lines.forEach((line) => line.trains.forEach((other) => delete other.isTracked));
+        train.isTracked = true;
+        const stations = findLine(lineId).stations;
+        tracking = {
+          line: lineId,
+          via: train.via,
+          route: train.route,
+          position: train.pos,
+          lastSeen: snapshot.updated,
+          lastSnapshot: snapshot.updated,
+          since: snapshot.updated,
+          trail: [pointAt(stations, train.pos)],
+          missed: 0,
+          follow: tracking ? tracking.follow : true,
+        };
+        if (tracking.follow) map.panTo(pointAt(stations, train.pos));
+        selectLine(lineId);
+      }
+      function untrack() {
+        tracking = null;
+        snapshot.lines.forEach((line) => line.trains.forEach((train) => delete train.isTracked));
+        render();
+      }
+      function refindTrackedTrain() {
+        // called with each fetched snapshot
+        const line = findLine(tracking.line);
+        if (!line) return;
+        if (snapshot.updated == tracking.lastSnapshot) {
+          // same snapshot polled again: just re-mark the same train
+          const same =
+            !tracking.missed &&
+            line.trains.find(
+              (train) =>
+                train.via == tracking.via && train.pos == tracking.position && train.route == tracking.route,
+            );
+          if (same) same.isTracked = true;
+          return;
+        }
+        tracking.lastSnapshot = snapshot.updated;
+        const minutesElapsed =
+            ((toSeconds(snapshot.updated) - toSeconds(tracking.lastSeen) + 86400) % 86400) / 60,
+          expectedMove = minutesElapsed / 2,
+          direction = tracking.via == 1 ? 1 : -1;
+        let best = null,
+          bestScore = Infinity;
+        for (const train of line.trains) {
+          const moved = (train.pos - tracking.position) * direction; // stations travelled since last seen
+          if (train.via != tracking.via || moved < -0.6 || moved > expectedMove + 2) continue;
+          const score = Math.abs(moved - expectedMove) + (train.route == tracking.route ? 0 : 0.75);
+          if (score < bestScore) [best, bestScore] = [train, score];
+        }
+        if (!best) {
+          tracking.missed++;
+          return;
+        }
+        best.isTracked = true;
+        Object.assign(tracking, {
+          position: best.pos,
+          route: best.route,
+          lastSeen: snapshot.updated,
+          missed: 0,
+        });
+        tracking.trail.push(pointAt(line.stations, best.pos));
+        if (tracking.follow) map.panTo(tracking.trail.at(-1));
+      }
+      function drawJourney(line) {
+        // glow over the rest of the route, dashed trail of where it has been
+        const stations = line.stations,
+          color = trainColor(line, tracking);
+        const ahead =
+          tracking.via == 1
+            ? stations.slice(Math.ceil(tracking.position))
+            : stations.slice(0, Math.floor(tracking.position) + 1).reverse();
+        L.polyline([pointAt(stations, tracking.position), ...ahead.map((station) => station.ll)], {
+          color,
+          weight: 14,
+          opacity: 0.3,
+          interactive: false,
+        }).addTo(trainLayer);
+        if (tracking.trail.length > 1) {
+          const trailStyle = { color, weight: 3, dashArray: '4 6', interactive: false };
+          L.polyline(tracking.trail, trailStyle).addTo(trainLayer);
+        }
+      }
+      function drawTrack() {
+        const panel = document.getElementById('track');
+        if (!tracking) {
+          panel.hidden = true;
+          return;
+        }
+        const line = findLine(tracking.line),
+          stations = line.stations,
+          towardLast = tracking.via == 1,
+          terminal = towardLast ? stations.length - 1 : 0;
+        const where = describePosition(stations, tracking.position, towardLast);
+        const status =
+          tracking.missed >= 3
+            ? tracking.position == terminal
+              ? translate('arrived', escapeHtml(stations[terminal].name))
+              : translate('lost', where, tracking.lastSeen)
+            : tracking.missed
+              ? translate('notSeen', where)
+              : where;
+        panel.hidden = false;
+        const routeLabel = tracking.route
+          ? `${routeDot(tracking.route)}<span class="muted">${ROUTE_NAME[tracking.route]}</span>`
+          : '';
+        const followCheckbox = `<input type="checkbox" ${tracking.follow ? 'checked' : ''} onchange="tracking.follow = this.checked">`;
+        panel.innerHTML = `
+          <div class="lh">
+            <span class="badge" style="background:${line.color};color:${textColorOn(line.color)}">${line.line}</span>
+            <b>${translate('tracking')} ${escapeHtml(stations[terminal].name)}</b>
+            ${routeLabel}
+          </div>
+          <div>${status}</div>
+          <div class="muted">${translate('since', tracking.since)}</div>
+          <div class="acts">
+            <label>${followCheckbox}${translate('follow')}</label>
+            <button onclick="untrack()">${translate('stop')}</button>
+          </div>`;
+      }
+
+      // ---- data, theme, mobile fold ----
+      function showStatus() {
+        const trainCount = snapshot.lines.reduce((total, line) => total + line.trains.length, 0);
+        document.getElementById('u').textContent = snapshot.updated
+          ? translate('status', trainCount, snapshot.updated)
+          : translate('waiting');
+      }
+      async function load() {
+        try {
+          snapshot = await (await fetch('api')).json();
+          showStatus();
+          if (snapshot.lines.length && !findLine(selectedLine)) selectedLine = '1'; // stale or bogus saved value
+          if (tracking) refindTrackedTrain();
+          if (snapshot.lines.length) render();
+        } catch (error) {
+          document.getElementById('u').textContent = translate('failed') + error;
+        }
+      }
+      const themeButton = document.getElementById('theme');
+      function showTheme() {
+        themeButton.textContent =
+          document.documentElement.dataset.theme === 'light' ? translate('dark') : translate('light');
+      }
+      function toggleTheme() {
+        const useLight = document.documentElement.dataset.theme !== 'light';
+        if (useLight) document.documentElement.dataset.theme = 'light';
+        else delete document.documentElement.dataset.theme;
+        try {
+          localStorage.setItem('theme', useLight ? 'light' : 'dark');
+        } catch (e) {}
+        showTheme();
+      }
+      showTheme();
+      const foldButton = document.getElementById('fold');
+      function setFold(folded) {
+        // mobile only: collapse the sidebar to its header
+        document.body.classList.toggle('folded', folded);
+        foldButton.textContent = folded ? translate('show') : translate('hide');
+        foldButton.setAttribute('aria-expanded', !folded);
+        try {
+          localStorage.setItem('folded', folded ? '1' : '0');
+        } catch (e) {}
+        map.invalidateSize();
+      }
+      let startFolded = true; // collapsed by default on mobile
+      try {
+        startFolded = localStorage.getItem('folded') !== '0';
+      } catch (e) {}
+      setFold(startFolded);
+      // not inline: inside onclick="", `lang` would resolve to the button's own lang attribute
+      function toggleLang() {
+        setLang(lang == 'es' ? 'en' : 'es');
+      }
+      function setLang(newLang) {
+        lang = newLang;
+        try {
+          localStorage.setItem('lang', newLang);
+        } catch (e) {}
+        document.documentElement.lang = newLang;
+        document
+          .querySelectorAll('[data-i18n]')
+          .forEach((element) => (element.textContent = translate(element.dataset.i18n)));
+        document.getElementById('tabs').setAttribute('aria-label', translate('line'));
+        const langButton = document.getElementById('lang');
+        langButton.textContent = translate('other');
+        langButton.title = translate('otherName');
+        showTheme();
+        setFold(document.body.classList.contains('folded'));
+        if (!snapshot) document.getElementById('u').textContent = translate('loading');
+        else {
+          showStatus();
+          if (snapshot.lines.length) render();
+        }
+      }
+      setLang(lang);
+      load();
+      setInterval(load, 20000);
+    </script>
+  </body>
+</html>

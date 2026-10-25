@@ -3,3 +3,4 @@ perseus-homepage/status.json
 eepymoonshine-public/status.json
 eepymoonshine-public/now-playing-art.jpg
 *.bak-*
+__pycache__/
