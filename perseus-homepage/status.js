@@ -10,6 +10,9 @@ document.querySelectorAll('a.card[href]').forEach(function (a) {
     ? host
     : (host === 'perseus' || host.endsWith('.ts.net')) ? TAILSCALE_IP : LAN_IP;
   document.getElementById('host-ip').textContent = ip;
+  if (ip === TAILSCALE_IP) {
+    document.querySelectorAll('a.card[data-lan-only]').forEach(function (a) { a.remove(); });
+  }
 })();
 
 (function () {

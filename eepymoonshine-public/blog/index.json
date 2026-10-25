@@ -1,5 +1,12 @@
 [
   {
+    "slug": "why-did-i-make-this-blog",
+    "title": "Why did I make this blog?",
+    "excerpt": "To start with, this webpage isn\u2019t meant to be anything fancy or famous. It\u2019s just an extension of my own lil\u2019 place in the internet. So in a way, I made it for myself and the blog is just a way to put my thoughts into place.",
+    "date": "2026-10-01",
+    "date_display": "October 1, 2026"
+  },
+  {
     "slug": "hello-world",
     "title": "Hello, world!",
     "excerpt": "Welcome to my little corner of the internet~ This is the very first post on this blog, mostly just to make sure everything works the way it's supposed to. If you can read this, it did! Woof!",
