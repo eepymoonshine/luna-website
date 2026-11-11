@@ -16,6 +16,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <link rel="stylesheet" href="/topbar.css?v=1" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script>
       try {
@@ -74,22 +75,11 @@
         display: flex;
         flex-direction: column;
       }
+      /* the bar itself comes from the main site's /topbar.css */
       #topbar {
         position: relative;
         z-index: 1001;
         flex: none;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        padding: 10px 16px;
-        background: var(--panel);
-        border-bottom: 1px solid var(--rule);
-      }
-      #topbar span {
-        font-size: 16px;
-        font-weight: 600;
-        letter-spacing: 0.5px;
       }
       #app {
         flex: 1;
@@ -145,10 +135,8 @@
         margin: -1px 0 4px 8px;
       }
       .btns button,
-      #track button,
-      #topbar a {
+      #track button {
         background: var(--ctl);
-        text-decoration: none;
         color: var(--ctl-fg);
         border: 1px solid var(--ctl-bd);
         border-radius: 999px;
@@ -160,8 +148,7 @@
           color 0.15s;
       }
       .btns button:hover,
-      #track button:hover,
-      #topbar a:hover {
+      #track button:hover {
         border-color: var(--accent);
         color: var(--accent);
       }
@@ -433,9 +420,13 @@
     </style>
   </head>
   <body>
-    <header id="topbar">
+    <header id="topbar" class="topbar">
       <span>✨ Luna's Internet Corner ✨</span>
-      <a href="/" data-i18n="home"></a>
+      <a class="topbar-link" href="/" data-i18n="home"></a>
+      <div class="weather-widget weather-loading" id="weather-widget" title="Loading weather…">
+        <span class="weather-icon" id="weather-icon">⛅</span>
+        <span class="weather-temp" id="weather-temp">–°</span>
+      </div>
     </header>
     <div id="app">
       <aside id="side">
@@ -1009,5 +1000,6 @@
       load();
       setInterval(load, 20000);
     </script>
+    <script src="/weather.js"></script>
   </body>
 </html>

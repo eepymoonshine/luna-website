@@ -23,6 +23,7 @@ perseus-homepage/
   nginx.conf: server block (server_name perseus.local _, default_server)
 eepymoonshine-public/
   index.html, main.js, weather.js, about.html/.md, style.css, banner*.jpg, favicon*, icons/
+  topbar.css: the top bar on every page (and on /metro/), with the weather widget
   blog/: index.html, post.html, index.json, posts/*.md
   nginx.conf: server block (server_name eepymoonshine.world www.eepymoonshine.world),
               including the /metro/ proxy to metro-map

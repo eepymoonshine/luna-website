@@ -1,0 +1,84 @@
+/* The top bar shared by every page on eepymoonshine.world, including /metro/ (which has its own
+   stylesheet and palette), so it carries its own colours. Page layout (spanning the page) is up to
+   each page's own CSS. */
+.topbar {
+  --tb-bg: #22242b;
+  --tb-card: #282a33;
+  --tb-card-hover: #2c2f37;
+  --tb-border: #34373f;
+  --tb-text: #d3dae3;
+  --tb-muted: #2eb398;
+  --tb-accent: #37d8d0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background-color: var(--tb-bg);
+  border-bottom: 1px solid var(--tb-border);
+  color: var(--tb-text);
+  font-family: 'Commissioner', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.topbar > span {
+  margin-right: auto;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.topbar-link,
+.weather-widget {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--tb-card);
+  border: 1px solid var(--tb-border);
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 14px;
+  color: var(--tb-text);
+  white-space: nowrap;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.topbar-link {
+  text-decoration: none;
+}
+
+.topbar-link:hover {
+  border-color: var(--tb-accent);
+  color: var(--tb-accent);
+}
+
+.weather-widget {
+  cursor: default;
+}
+
+.weather-widget:hover {
+  background-color: var(--tb-card-hover);
+  border-color: var(--tb-accent);
+}
+
+.weather-widget.weather-loading {
+  color: var(--tb-muted);
+}
+
+.weather-icon {
+  font-size: 1.05em;
+  line-height: 1;
+}
+
+.weather-temp {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 600px) {
+  .topbar-link,
+  .weather-widget {
+    padding: 5px 9px;
+    font-size: 12.5px;
+  }
+}

@@ -18,7 +18,8 @@ python3 test_metro_map.py         # tests
 ## Files
 
 - `metro_map.py` — worker, board parsing, train inference, HTTP server
-- `index.html` — the map page
+- `index.html` — the map page; its top bar uses the main site's `/topbar.css` and `/weather.js`, so it's
+  unstyled when run standalone
 - `stations.json` — station code → `[lat, lon, name]` (coordinates from Wikidata)
 - `deploy/metro-map.service` — systemd unit used on perseus (the nginx `/metro/` block is in
   `../eepymoonshine-public/nginx.conf`)
